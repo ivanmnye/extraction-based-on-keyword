@@ -8,37 +8,48 @@ files=[]
 notprocessed=[]
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\inye\AppData\Local\Tesseract-OCR\tesseract.exe'
 files = [f for f in os.listdir('.') if os.path.isfile(f)]
+x = [f for f in os.listdir("../normalised/")]
+for i in range(len(x)):
+    name=x[i].split("$")
+    x[i]=name[0]+".pdf"
 for filename in files:
     print("Currently working on ",filename,"Please wait for it to proceed...")
-    successfull=0
-    step=1
-    extension=filename.split(".")
-    if extension[1]=="pdf":
-        pdfFileObj = open(filename,'rb')               #open allows you to read the file
-        pdfReader = PyPDF2.PdfFileReader(pdfFileObj)   #The pdfReader variable is a readable object that will be parsed
-        num_pages = pdfReader.numPages 
-        with Img(filename=filename, resolution=300) as img:
-            img.compression_quality = 99
-            img.save(filename="sample_scan.jpg")
-        for num in range(num_pages):
-            if num_pages ==1:
-                fileimage="sample_scan.jpg"
-            else:
-                fileimage="sample_scan-"+str(num)+".jpg"
-            content=pytesseract.image_to_string(Image.open(fileimage))
-            m = re.findall(r"SHEET", content)
-            if (m):
-                print("keyword has been found on page ",num)
-                a=filename.split(".")
-                a=str(a[0])+"$"+str(step)+".jpg"
-                os.rename(fileimage,a)
-                move(a,r"C:\Users\inye\Desktop\2019 Training Attendance Records_Returned\normalised")
-                step+=1
-                successfull=1
-            else:
-                os.remove(fileimage)
-    if successfull==0:
-        print(filename," has not been processed successfully\n")
-        notprocessed.append(filename)
+    if filename in x:
+        print(filename," already processed. going to next...\n")
     else:
-        print(filename," has been processed successfully\n")
+        successfull=0
+        step=1
+        extension=filename.split(".")
+        if extension[1]=="pdf":
+            pdfFileObj = open(filename,'rb')               #open allows you to read the file
+            pdfReader = PyPDF2.PdfFileReader(pdfFileObj)   #The pdfReader variable is a readable object that will be parsed
+            num_pages = pdfReader.numPages 
+            with Img(filename=filename, resolution=300) as img:
+                img.compression_quality = 99
+                img.save(filename="sample_scan.jpg")
+            for num in range(num_pages):
+                if num_pages ==1:
+                    fileimage="sample_scan.jpg"
+                else:
+                    fileimage="sample_scan-"+str(num)+".jpg"
+                content=pytesseract.image_to_string(Image.open(fileimage))
+                m = re.findall(r"SHEET", content)
+                if (m):
+                    print("keyword has been found on page ",num)
+                    a=filename.split(".")
+                    a=str(a[0])+"$"+str(step)+".jpg"
+                    os.rename(fileimage,a)
+                    move(a,r"C:\Users\inye\Desktop\2019 Training Attendance Records_Returned\normalised")
+                    step+=1
+                    successfull=1
+                else:
+                    os.remove(fileimage)
+        if successfull==0:
+            print(filename," has not been processed successfully\n")
+            notprocessed.append(filename)
+        else:
+            print(filename," has been processed successfully\n")
+print("Job done")
+print("\nThose have not being processed")
+for k in notprocessed:
+    print(k)
