@@ -16,11 +16,12 @@ for filename in files:
     print("Currently working on ",filename,"Please wait for it to proceed...")
     if filename in x:
         print(filename," already processed. going to next...\n")
+        os.remove(filename)
     else:
         successfull=0
         step=1
         extension=filename.split(".")
-        if extension[1]=="pdf":
+        if extension[len(extension)-1]=="pdf":
             pdfFileObj = open(filename,'rb')               #open allows you to read the file
             pdfReader = PyPDF2.PdfFileReader(pdfFileObj)   #The pdfReader variable is a readable object that will be parsed
             num_pages = pdfReader.numPages 
@@ -49,6 +50,7 @@ for filename in files:
             notprocessed.append(filename)
         else:
             print(filename," has been processed successfully\n")
+            os.remove(filename)
 print("Job done")
 print("\nThose have not being processed")
 for k in notprocessed:
